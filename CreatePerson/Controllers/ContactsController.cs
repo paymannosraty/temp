@@ -6,33 +6,32 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CreatePerson.Controllers
 {
-	public class PeopleController : Infrastructure.BaseApiController
+	public class ContactsController : Infrastructure.BaseApiController
 	{
 		private readonly HttpClient _httpClient;
 
-		public PeopleController(HttpClient httpClient) : base()
+		public ContactsController(HttpClient httpClient) : base()
 		{
 			_httpClient = httpClient;
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> Post(Models.Person contact)
+		public async Task<ActionResult<Models.Contact>> Post(Models.Contact contact)
 		{
 
 			var contactDic =
-				new Dictionary<string, object>();
-
-			contactDic.Add("Contact", contact.Contact);
+				new Dictionary<string, object>
+				{
+					{ "Contact", contact }
+				};
 
 			var response =
 				await _httpClient.PostAsJsonAsync<Dictionary<string, object>>($"/api/contact/save?apikey=lczdz7c0i7i0rlpbrfov8els42ytunti", contactDic);
 
-			var e = response.StatusCode;
-
 			var result =
-				await response.Content.ReadFromJsonAsync<bool>();
+				await response.Content.ReadAsStringAsync();
 
-			return Ok();
+			return Ok(value: result);
 
 		}
 	}
